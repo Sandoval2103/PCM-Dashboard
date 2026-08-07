@@ -60,6 +60,9 @@
         <header class="header">
             <img src="https://www.grupomodelo.com/themes/custom/modelo/dist/img/logo_grupo_modelo.png" alt="Logo Grupo Modelo" class="header-logo" onerror="this.src='https://via.placeholder.com/150x70/0A1C2E/D4AF37?text=GRUPO+MODELO'">
             <div class="header-title">
+               <button onclick="cerrarSesion()" style="background: transparent; color: #ff4c4c; border: 1px solid #ff4c4c; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; margin-bottom: 20px;">
+    🚪 Cerrar Sesión
+                </button>
                 <h1>Reporte Táctico PCM</h1>
                 <p>Directorio General de Efectividad</p>
             </div>
@@ -120,8 +123,12 @@
             grid.innerHTML = '<div style="color: var(--alert-red); text-align: center; grid-column: 1/-1;">Error al conectar con la base de datos.</div>';
             console.error(error);
         }
-    }
-
+        }
+        // === FUNCIÓN PARA CERRAR SESIÓN ===
+            function cerrarSesion() {
+            sessionStorage.removeItem("acceso_concedido"); // Destruye la llave
+            window.location.href = "login.html"; // Te regresa al candado
+        }
     // === NUEVA FUNCIÓN PARA ELIMINAR ===
     async function eliminarReporte(id) {
         // Confirmación de seguridad
