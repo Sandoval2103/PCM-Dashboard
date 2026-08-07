@@ -63,7 +63,7 @@
     <div class="dashboard">
         <header class="header">
             <div class="header-left">
-                <a href="index.html" class="btn-volver">[ &larr; VOLVER AL HUB ]</a>
+                <a href="Menu Principal.html" class="btn-volver">[ &larr; VOLVER AL HUB ]</a>
                 <img src="https://www.grupomodelo.com/themes/custom/modelo/dist/img/logo_grupo_modelo.png" alt="Logo Grupo Modelo" class="header-logo" onerror="this.src='https://via.placeholder.com/150x70/0A1C2E/D4AF37?text=GRUPO+MODELO'">
             </div>
             <div class="header-title">
@@ -189,7 +189,12 @@
 
     <!-- El script con la lógica de datos ha sido removido. El HTML está listo para ser poblado desde tu nuevo backend. -->
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzm7Cru0fWigUAQiIQmjZ64FgSwXWHn3ByQ7EIpvVnaEdIjk6Ibd4IAtJoDYZeqBbVS/exec"; // <-- Pega tu URL aquí
+    // === CANDADO DE SEGURIDAD ===
+    if (sessionStorage.getItem("acceso_concedido") !== "true") {
+        window.location.href = "login.html"; // Si no hay llave, patada al login
+    }
+    
+    const API_URL = "https://script.google.com/macros/s/AKfycbyKeVzWjqYRNo58g2OHp8A8uuWDBuDQtT5t6Gp0eWypt2DAHw5g6FtnST3G_tb_Kjwx/exec"; // <-- Pega tu URL aquí
     document.addEventListener('DOMContentLoaded', async () => {
         const parametros = new URLSearchParams(window.location.search);
         const idReporte = parametros.get('id') ? parametros.get('id').trim() : null;

@@ -102,7 +102,11 @@
     </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzm7Cru0fWigUAQiIQmjZ64FgSwXWHn3ByQ7EIpvVnaEdIjk6Ibd4IAtJoDYZeqBbVS/exec"; // <-- Pega aquí tu URL
+    // === CANDADO DE SEGURIDAD ===
+    if (sessionStorage.getItem("acceso_concedido") !== "true") {
+        window.location.href = "login.html"; // Si no hay llave, patada al login
+    }
+    const API_URL = "https://script.google.com/macros/s/AKfycbyKeVzWjqYRNo58g2OHp8A8uuWDBuDQtT5t6Gp0eWypt2DAHw5g6FtnST3G_tb_Kjwx/exec"; // <-- Pega aquí tu URL
     const grid = document.getElementById('reportGrid');
     let reportesGlobales = [];
 
