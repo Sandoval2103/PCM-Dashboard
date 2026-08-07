@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Táctico PCM - Plantilla Base</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #12151C; --brand-navy: #0A1C2E; --brand-navy-light: #162B42; --brand-gold: #D4AF37; --brand-gold-glow: rgba(212, 175, 55, 0.3); --text-main: #F0F4F8; --text-muted: #9BA4B5; --alert-red: #E53935; --alert-amber: #FFB300; --success-green: #4CAF50; --font-ui: 'Inter', sans-serif; --font-mono: 'Fira Code', monospace; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-ui); line-height: 1.6; padding: 2rem; min-height: 100vh; background-image: linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px); background-size: 30px 30px; }
+        .dashboard { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(min-content, max-content); gap: 1.5rem; }
+        .header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2rem; background: linear-gradient(90deg, var(--brand-navy), var(--bg-dark)); border-bottom: 2px solid var(--brand-gold); border-radius: 8px 8px 0 0; margin-bottom: 1rem; }
+        .header-logo { height: 70px; width: auto; object-fit: contain; }
+        .header-title { text-align: right; }
+        .header-title h1 { font-family: var(--font-mono); color: var(--brand-gold); font-size: 1.8rem; letter-spacing: 1px; text-transform: uppercase; }
+        .header-title p { color: var(--text-muted); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
+        .card { background-color: var(--brand-navy-light); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1.8rem; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.3s ease, border-color 0.3s ease; }
+        .card:hover { border-color: var(--brand-gold-glow); transform: translateY(-2px); }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--brand-gold); }
+        .card-title { font-family: var(--font-mono); color: var(--brand-gold); font-size: 1.1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem; }
+        .score-card { grid-column: span 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .score-display { text-align: center; margin: 1rem 0; }
+        .score-number { font-family: var(--font-mono); font-size: 4.5rem; font-weight: 700; color: var(--text-main); line-height: 1; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .score-denominator { font-size: 2rem; color: var(--text-muted); }
+        .score-status { display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 0.9rem; margin-top: 10px; text-transform: uppercase; }
+        
+        /* Clases de estado que puedes aplicar con JS posteriormente */
+        .status-optimo { background-color: rgba(76, 175, 80, 0.15); color: var(--success-green); border: 1px solid var(--success-green); }
+        .status-estable { background-color: rgba(255, 179, 0, 0.15); color: var(--alert-amber); border: 1px solid var(--alert-amber); }
+        .status-critico { background-color: rgba(229, 57, 53, 0.15); color: var(--alert-red); border: 1px solid var(--alert-red); }        
+        
+        .formula-box { background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); text-align: center; border-left: 2px solid var(--text-muted); }
+        .balance-card { grid-column: span 2; }
+        .bar-group { margin-bottom: 1.5rem; }
+        .bar-label { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 600; }
+        .bar-container { height: 32px; background-color: #000; border-radius: 4px; display: flex; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .bar { display: flex; align-items: center; padding: 0 10px; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: #000; transition: width 1s ease-in-out; }
+        .bar-pm02 { background-color: var(--brand-gold); justify-content: flex-start; }
+        .bar-pm01 { background-color: var(--alert-red); color: #fff; justify-content: flex-end; }
+        .alert-box { background-color: rgba(229, 57, 53, 0.1); border: 1px solid var(--alert-red); border-left: 4px solid var(--alert-red); padding: 1rem; border-radius: 4px; margin-top: 1rem; display: flex; gap: 15px; align-items: flex-start; }
+        .alert-icon { color: var(--alert-red); font-size: 1.2rem; font-family: var(--font-mono); font-weight: bold; }
+        .list-card ul { list-style: none; }
+        .list-card li { padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .list-card li:last-child { border-bottom: none; }
+        .aciertos-card::before { background-color: var(--success-green); }
+        .ciegos-card::before { background-color: var(--alert-amber); }
+        .directriz-card { grid-column: span 3; background: linear-gradient(135deg, var(--brand-navy-light), var(--brand-navy)); }
+        .directriz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .directriz-item { background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 6px; border: 1px solid rgba(212, 175, 55, 0.2); }
+        .directriz-item h4 { color: var(--brand-gold); margin-bottom: 0.8rem; font-size: 1.1rem; }
+        @media (max-width: 1024px) { .dashboard { grid-template-columns: repeat(2, 1fr); } .balance-card, .directriz-card { grid-column: 1 / -1; } }
+        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } .header { flex-direction: column; text-align: center; gap: 15px; } .header-title { text-align: center; } .directriz-grid { grid-template-columns: 1fr; } }
+        
+        .btn-volver { display: inline-block; padding: 6px 12px; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--brand-gold); color: var(--brand-gold); text-decoration: none; font-family: var(--font-mono); font-size: 0.8rem; border-radius: 4px; transition: all 0.3s ease; text-transform: uppercase; margin-bottom: 15px; align-self: flex-start; }
+        .btn-volver:hover { background: var(--brand-gold); color: #000; font-weight: bold; }
+        .header-left { display: flex; flex-direction: column; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <div class="header-left">
+                <a href="Menu Principal.html" class="btn-volver">[ &larr; VOLVER AL HUB ]</a>
+                <img src="https://www.grupomodelo.com/themes/custom/modelo/dist/img/logo_grupo_modelo.png" alt="Logo Grupo Modelo" class="header-logo" onerror="this.src='https://via.placeholder.com/150x70/0A1C2E/D4AF37?text=GRUPO+MODELO'">
+            </div>
+            <div class="header-title">
+                <h1 id="lbl-titulo">Reporte de Estado Táctico</h1>
+                <p>Compañía Cervecera de Zacatecas | Envasado IA</p>
+            </div>
+        </header>
+
+        <section class="card score-card">
+            <h2 class="card-title">:: Calificación Global</h2>
+            <div class="score-display">
+                <div class="score-number"><span id="lbl-score">0</span><span class="score-denominator">/100</span></div>
+                <div id="lbl-status" class="score-status">ESTADO</div>
+            </div>
+            
+            <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+                    <span>Índice de Proactividad (IP):</span>
+                    <span id="lbl-ip-txt" style="font-family: var(--font-mono); font-weight: bold; color: var(--text-main);">0%</span>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; margin-bottom: 12px; overflow: hidden;">
+                    <div id="lbl-ip-bar" style="width: 0%; height: 100%; background: var(--text-muted);"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+                    <span>Índice de Cobertura Reactiva (ICR):</span>
+                    <span id="lbl-icr-txt" style="font-family: var(--font-mono); font-weight: bold; color: var(--text-main);">0%</span>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; margin-bottom: 15px; overflow: hidden;">
+                    <div id="lbl-icr-bar" style="width: 0%; height: 100%; background: var(--text-muted);"></div>
+                </div>
+            </div>
+
+            <div class="formula-box" style="font-size: 0.75rem; padding: 0.5rem;">
+                Score = (0.60 &times; ICR) + (0.40 &times; IP)
+            </div>
+        </section>
+
+        <section class="card balance-card">
+            <h2 class="card-title">:: Balance Operacional (Preventivo vs Correctivo)</h2>
+            <div class="bar-group">
+                <div class="bar-label"><span>Órdenes Planificadas (%VPM02 vs %VPM01)</span></div>
+                <div class="bar-container">
+                    <div id="lbl-vol-pm02" class="bar bar-pm02" style="width: 50%;">50% PM02</div>
+                    <div id="lbl-vol-pm01" class="bar bar-pm01" style="width: 50%;">50% PM01</div>
+                </div>
+            </div>
+            <div class="bar-group">
+                <div class="bar-label"><span>Impacto Real en Ejecución (PM02% vs PM01%)</span></div>
+                <div class="bar-container">
+                    <div id="lbl-hrs-pm02" class="bar bar-pm02" style="width: 50%;">50% (0 hrs)</div>
+                    <div id="lbl-hrs-pm01" class="bar bar-pm01" style="width: 50%;">50% (0 hrs)</div>
+                </div>
+            </div>
+            <div class="alert-box">
+                <div class="alert-icon">[!]</div>
+                <div>
+                    <strong style="color: var(--alert-red);">ALERTA TÁCTICA:</strong> <span id="lbl-alerta">...</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="card list-card aciertos-card">
+            <h2 class="card-title" style="color: var(--success-green);">:: Fuego Extinguido (Aciertos)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Equipos críticos neutralizados con órdenes en el PCM.</p>
+            <ul id="lbl-aciertos">
+                <li>Sin aciertos registrados</li>
+            </ul>
+        </section>
+
+        <section class="card list-card ciegos-card">
+            <h2 class="card-title" style="color: var(--alert-amber);">:: Puntos Ciegos (Fugas)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Equipos críticos sin OT asignada durante el PCM.</p>
+            <ul id="lbl-ciegos">
+                <li>Sin puntos ciegos registrados</li>
+            </ul>
+        </section>
+        
+        <section class="card list-card">
+            <h2 class="card-title" style="color: var(--text-main);">:: Carga por Especialidad</h2>
+            
+            <div style="margin-bottom: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+                    <span style="font-family: var(--font-mono); font-weight: 600;">MECÁNICA</span>
+                    <span id="lbl-pct-mec" style="font-weight: bold; color: var(--brand-gold);">0%</span>
+                </div>
+                <p id="lbl-det-mec" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">-</p>
+                <div style="height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden;">
+                    <div id="bar-mec" style="width: 0%; height: 100%; background: var(--brand-gold);"></div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+                    <span style="font-family: var(--font-mono); font-weight: 600;">ELÉCTRICA / CONTROL</span>
+                    <span id="lbl-pct-elec" style="font-weight: bold; color: var(--success-green);">0%</span>
+                </div>
+                <p id="lbl-det-elec" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">-</p>
+                <div style="height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden;">
+                    <div id="bar-elec" style="width: 0%; height: 100%; background: var(--success-green);"></div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem; padding: 12px; background: rgba(0,0,0,0.3); border-left: 3px solid var(--text-muted); font-size: 0.8rem;">
+                <strong style="color: var(--text-main);">INSIGHT TÁCTICO:</strong> <span id="lbl-insight">...</span>
+            </div>
+        </section>
+
+        <section class="card directriz-card">
+            <h2 class="card-title">:: Directriz Táctica para Siguiente Ciclo</h2>
+            <div class="directriz-grid">
+                <div class="directriz-item">
+                    <h4>Auditoría de Backlog (Próximo PCM)</h4>
+                    <p id="lbl-backlog">...</p>
+                </div>
+                <div class="directriz-item">
+                    <h4>Mitigación de Correctivos</h4>
+                    <p id="lbl-mitigacion">...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- El script con la lógica de datos ha sido removido. El HTML está listo para ser poblado desde tu nuevo backend. -->
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzm7Cru0fWigUAQiIQmjZ64FgSwXWHn3ByQ7EIpvVnaEdIjk6Ibd4IAtJoDYZeqBbVS/exec"; // <-- Pega tu URL aquí
+    document.addEventListener('DOMContentLoaded', async () => {
+        const parametros = new URLSearchParams(window.location.search);
+        const idReporte = parametros.get('id') ? parametros.get('id').trim() : null;
+
+        if (!idReporte) {
+            document.getElementById('lbl-titulo').textContent = "ERROR: ID NO PROPORCIONADO EN LA URL";
+            return;
+        }
+
+        try {
+            // Obtener datos del backend
+            const respuesta = await fetch(API_URL);
+            const listaReportes = await respuesta.json();
+            
+            // Buscar el ID exacto
+            const r = listaReportes.find(item => String(item.ID).trim() === String(idReporte));
+
+            if (!r) {
+                document.getElementById('lbl-titulo').textContent = "REPORTE NO ENCONTRADO";
+                return;
+            }
+
+            // --- INYECTAR DATOS ---
+            
+            document.title = `Reporte Táctico ${r.Linea || 'S/L'} - Grupo Modelo`;
+            document.getElementById('lbl-titulo').textContent = `Reporte de Estado Táctico - ${r.Linea || 'S/L'}`;
+            document.getElementById('lbl-score').textContent = r.Score_Global ? parseFloat(r.Score_Global).toFixed(1) : '0';
+            
+            // === LA MAGIA PARA LOS COLORES Y ACENTOS ===
+            const statusBox = document.getElementById('lbl-status');
+            // 1. Tomamos el texto, ej. "Crítico" o "Óptimo", y lo pasamos a minúsculas
+            let estadoOriginal = r.Estado ? r.Estado.toLowerCase() : 'critico';
+            // 2. Limpiamos los acentos para que coincida con tus clases CSS (status-critico, status-optimo, status-estable)
+            let claseCSS = estadoOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            // Imprimimos el texto tal cual para que se vea bien en pantalla, pero usamos la clase limpia para el color
+            statusBox.textContent = (r.Estado || "S/E").toUpperCase();
+            statusBox.className = `score-status status-${claseCSS}`;
+
+            // IP e ICR 
+            document.getElementById('lbl-ip-txt').textContent = (r['IP_%'] || 0) + '%';
+            document.getElementById('lbl-ip-bar').style.width = (r['IP_%'] || 0) + '%';
+            document.getElementById('lbl-icr-txt').textContent = (r['ICR_%'] || 0) + '%';
+            document.getElementById('lbl-icr-bar').style.width = (r['ICR_%'] || 0) + '%';
+
+            // Balance Operacional (Escudo protector numérico)
+            // parseFloat fuerza a que el valor sea interpretado como número. Si es fecha o texto raro, evita desbordamientos.
+            let volPM02 = parseFloat(r['%VPM02']) || 0;
+            let volPM01 = parseFloat(r['%VPM01']) || 0;
+
+            document.getElementById('lbl-vol-pm02').style.width = volPM02 + '%';
+            document.getElementById('lbl-vol-pm02').textContent = `${volPM02}% VPM02`;
+            document.getElementById('lbl-vol-pm01').style.width = volPM01 + '%';
+            document.getElementById('lbl-vol-pm01').textContent = `${volPM01}% VPM01`;
+
+            document.getElementById('lbl-hrs-pm02').style.width = (r['PM02_%'] || 0) + '%';
+            document.getElementById('lbl-hrs-pm02').textContent = `${r['PM02_%'] || 0}% (${r.PM02_HRS || 0} hrs)`;
+            document.getElementById('lbl-hrs-pm01').style.width = (r['PM01_%'] || 0) + '%';
+            document.getElementById('lbl-hrs-pm01').textContent = `${r['PM01_%'] || 0}% (${r.PM01_HRS || 0} hrs)`;
+
+            document.getElementById('lbl-alerta').textContent = r.Alerta_Tactica || "Sin alertas";
+
+            // Listas
+            const ulAciertos = document.getElementById('lbl-aciertos');
+            ulAciertos.innerHTML = r.Fuego_Extinguido ? r.Fuego_Extinguido.split(',').map(item => `<li>${item.trim()}</li>`).join('') : '<li>Sin aciertos registrados</li>';
+
+            const ulCiegos = document.getElementById('lbl-ciegos');
+            ulCiegos.innerHTML = r.Puntos_Ciegos ? r.Puntos_Ciegos.split(',').map(item => `<li>${item.trim()}</li>`).join('') : '<li>Sin puntos ciegos registrados</li>';
+
+            // Especialidad 
+            document.getElementById('lbl-pct-mec').textContent = (r['%_Mecanica'] || 0) + '%';
+            document.getElementById('lbl-det-mec').textContent = r.Detalles_Mecanica || "-";
+            document.getElementById('bar-mec').style.width = (r['%_Mecanica'] || 0) + '%';
+
+            document.getElementById('lbl-pct-elec').textContent = (r['%_Electrica'] || 0) + '%';
+            document.getElementById('lbl-det-elec').textContent = r.Detalles_Electrica || "-";
+            document.getElementById('bar-elec').style.width = (r['%_Electrica'] || 0) + '%';
+
+            document.getElementById('lbl-insight').textContent = r.Insight_Especialidad || "-";
+            
+            // Directrices 
+            document.getElementById('lbl-backlog').textContent = r['Próximo_PCM'] || "-";
+            document.getElementById('lbl-mitigacion').textContent = r['Mitigación _Correctivos'] || "-";
+
+        } catch (error) {
+            document.getElementById('lbl-titulo').textContent = "ERROR AL CARGAR DATOS";
+            console.error("Detalle del error:", error);
+        }
+    });
+</script>
+
+</body>
+</html>

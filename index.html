@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Mando PCM - Grupo Modelo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #12151C; --brand-navy: #0A1C2E; --brand-navy-light: #162B42; --brand-gold: #D4AF37; --text-main: #F0F4F8; --text-muted: #9BA4B5; --alert-red: #E53935; --alert-amber: #FFB300; --success-green: #4CAF50; --font-ui: 'Inter', sans-serif; --font-mono: 'Fira Code', monospace; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-ui); line-height: 1.6; padding: 2rem; min-height: 100vh; background-image: linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px); background-size: 30px 30px; }
+        .dashboard { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
+        
+        /* HEADER */
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2rem; background: linear-gradient(90deg, var(--brand-navy), var(--bg-dark)); border-bottom: 2px solid var(--brand-gold); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .header-logo { height: 70px; width: auto; object-fit: contain; }
+        .header-title { text-align: right; }
+        .header-title h1 { font-family: var(--font-mono); color: var(--brand-gold); font-size: 1.8rem; letter-spacing: 1px; text-transform: uppercase; }
+        .header-title p { color: var(--text-muted); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
+        
+        /* CONTROLES DE FILTRADO */
+        .filter-panel { background-color: rgba(22, 43, 66, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 1.5rem; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 200px; }
+        .filter-group label { font-family: var(--font-mono); color: var(--brand-gold); font-size: 0.8rem; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .filter-control { background-color: var(--bg-dark); color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 4px; font-family: var(--font-ui); font-size: 1rem; outline: none; transition: border-color 0.3s ease; color-scheme: dark; }
+        .filter-control:focus { border-color: var(--brand-gold); }
+        .btn-clear { background-color: transparent; color: var(--alert-red); border: 1px solid var(--alert-red); padding: 0.8rem 1.5rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; height: 100%; align-self: flex-end; text-transform: uppercase; }
+        .btn-clear:hover { background-color: rgba(229, 57, 53, 0.1); }
+
+        /* CONTENEDOR DE TARJETAS */
+        .grid-reports { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        
+        /* TARJETA DE REPORTE */
+        .report-card { display: block; text-decoration: none; background-color: var(--brand-navy-light); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; cursor: pointer; }
+        .report-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--brand-gold); transition: width 0.3s ease; }
+        .report-card:hover { border-color: var(--brand-gold); transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        .report-card:hover::before { width: 8px; }
+        
+        /* ELEMENTOS DE LA TARJETA */
+        .card-line { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.2rem; display: flex; justify-content: space-between; align-items: center; }
+        .card-date { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem; }
+        .card-score { font-family: var(--font-mono); font-size: 1.8rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .card-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; font-family: var(--font-ui); }
+        
+        /* COLORES DINÁMICOS */
+        .optimo .card-score { color: var(--success-green); }
+        .optimo .card-badge { background-color: rgba(76, 175, 80, 0.15); color: var(--success-green); border: 1px solid var(--success-green); }
+        .estable .card-score { color: var(--alert-amber); }
+        .estable .card-badge { background-color: rgba(255, 179, 0, 0.15); color: var(--alert-amber); border: 1px solid var(--alert-amber); }
+        .critico .card-score { color: var(--alert-red); }
+        .critico .card-badge { background-color: rgba(229, 57, 53, 0.15); color: var(--alert-red); border: 1px solid var(--alert-red); }
+        .view-btn { margin-top: 1.5rem; display: block; width: 100%; padding: 10px; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); font-family: var(--font-mono); font-size: 0.85rem; border-radius: 4px; transition: all 0.3s ease; }
+        .report-card:hover .view-btn { background: var(--brand-gold); color: #000; border-color: var(--brand-gold); font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <img src="https://www.grupomodelo.com/themes/custom/modelo/dist/img/logo_grupo_modelo.png" alt="Logo Grupo Modelo" class="header-logo" onerror="this.src='https://via.placeholder.com/150x70/0A1C2E/D4AF37?text=GRUPO+MODELO'">
+            <div class="header-title">
+                <h1>Reporte Táctico PCM</h1>
+                <p>Directorio General de Efectividad</p>
+            </div>
+        </header>
+
+        <div class="filter-panel">
+            <div class="filter-group">
+                <label for="lineFilter">[ BÚSQUEDA POR LÍNEA ]</label>
+                <select id="lineFilter" class="filter-control">
+                    <option value="all">TODAS LAS LÍNEAS</option>
+                    <option value="L1">LÍNEA 1</option>
+                    <option value="L2">LÍNEA 2</option>
+                    <option value="L3">LÍNEA 3</option>
+                    <option value="L4">LÍNEA 4</option>
+                    <option value="L5">LÍNEA 5</option>
+                    <option value="L6">LÍNEA 6</option>
+                    <option value="L7">LÍNEA 7</option>
+                    <option value="L8">LÍNEA 8</option>
+                    <option value="L9">LÍNEA 9</option>
+                    <option value="L10">LÍNEA 10</option>
+                    <option value="L11">LÍNEA 11</option>
+                    <option value="L12">LÍNEA 12</option>
+                    <option value="L13">LÍNEA 13</option>
+                    <option value="L14">LÍNEA 14</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="dateFilter">[ BÚSQUEDA POR FECHA DEL PCM ]</label>
+                <input type="date" id="dateFilter" class="filter-control">
+            </div>
+
+            <button id="clearFilters" class="btn-clear">[ X ] LIMPIAR</button>
+        </div>
+
+        <!-- CONTENEDOR DE TARJETAS -->
+        <div class="grid-reports" id="reportGrid">
+            <!-- Las tarjetas se inyectarán aquí mediante JS -->
+        </div>
+    </div>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzm7Cru0fWigUAQiIQmjZ64FgSwXWHn3ByQ7EIpvVnaEdIjk6Ibd4IAtJoDYZeqBbVS/exec"; // <-- Pega aquí tu URL
+    const grid = document.getElementById('reportGrid');
+    let reportesGlobales = [];
+
+    async function cargarDatos() {
+        grid.innerHTML = '<div style="color: var(--brand-gold); text-align: center; grid-column: 1/-1;">Cargando datos desde el servidor...</div>';
+        try {
+            const respuesta = await fetch(API_URL);
+            reportesGlobales = await respuesta.json();
+            renderizarTarjetas(reportesGlobales);
+        } catch (error) {
+            grid.innerHTML = '<div style="color: var(--alert-red); text-align: center; grid-column: 1/-1;">Error al conectar con la base de datos.</div>';
+            console.error(error);
+        }
+    }
+
+    // === NUEVA FUNCIÓN PARA ELIMINAR ===
+    async function eliminarReporte(id) {
+        // Confirmación de seguridad
+        if (confirm("⚠️ ¿Estás seguro de que deseas eliminar este reporte? Se borrará de tu base de datos y no se puede deshacer.")) {
+            
+            // Efecto visual de carga
+            grid.innerHTML = '<div style="color: var(--alert-amber); text-align: center; grid-column: 1/-1;">[ ELIMINANDO REPORTE DE LA BASE DE DATOS... ]</div>';
+
+            try {
+                // Enviar la orden de borrar al servidor
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "delete", ID: id })
+                });
+                
+                // Recargar las tarjetas actualizadas
+                await cargarDatos();
+            } catch (error) {
+                alert("Ocurrió un error al intentar eliminar.");
+                console.error(error);
+                await cargarDatos(); // Recargar por si acaso
+            }
+        }
+    }
+
+    function renderizarTarjetas(datos) {
+        grid.innerHTML = '';
+        if (datos.length === 0) {
+            grid.innerHTML = '<div class="no-results" style="display:block; grid-column: 1/-1; text-align: center; color: var(--text-muted); font-family: var(--font-mono); padding: 2rem; border: 1px dashed rgba(255,255,255,0.2);">No hay reportes cargados en la base de datos.</div>';
+            return;
+        }
+
+        const noResultsMsg = document.createElement('div');
+        noResultsMsg.id = 'noResultsMsg';
+        noResultsMsg.className = 'no-results';
+        noResultsMsg.style.cssText = 'display: none; grid-column: 1/-1; text-align: center; color: var(--text-muted); font-family: var(--font-mono); padding: 2rem; border: 1px dashed rgba(255,255,255,0.2);';
+        noResultsMsg.textContent = 'No se encontraron reportes con estos filtros.';
+        grid.appendChild(noResultsMsg);
+
+        const limpiarFechaFiltro = (fechaStr) => {
+            if (!fechaStr || String(fechaStr).trim() === 'undefined') return ''; 
+            return String(fechaStr).split('T')[0];
+        };
+
+        const formatearFechaVista = (fechaStr) => {
+            if (!fechaStr || String(fechaStr).trim() === 'undefined') return 'S/F';
+            let soloFecha = String(fechaStr).split('T')[0]; 
+            let partes = soloFecha.split('-');
+            if (partes.length !== 3) return soloFecha;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`; 
+        };
+
+        datos.forEach((r) => {
+            let numeroLinea = r.Linea ? r.Linea.toString().replace(/[^0-9]/g, '') : '-'; 
+            let idLineaParaFiltro = numeroLinea !== '-' ? 'L' + numeroLinea : 'all';
+
+            let filtroInicio = limpiarFechaFiltro(r.Fecha_Inicio);
+            let filtroFin = limpiarFechaFiltro(r.Fecha_Fin);
+
+            let vistaInicio = formatearFechaVista(r.Fecha_Inicio);
+            let vistaFin = formatearFechaVista(r.Fecha_Fin);
+
+            let estadoOriginal = r.Estado ? r.Estado.toLowerCase() : 'critico';
+            let claseCSS = estadoOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+            const tarjeta = document.createElement('div');
+            tarjeta.className = `report-card ${claseCSS}`;
+            
+            tarjeta.setAttribute('data-line', idLineaParaFiltro);
+            tarjeta.setAttribute('data-start', filtroInicio);
+            tarjeta.setAttribute('data-end', filtroFin);
+
+            // === AÑADIDO EL BOTÓN DE ELIMINAR EN EL TÍTULO ===
+            tarjeta.innerHTML = `
+                <div class="card-line">
+                    LÍNEA ${numeroLinea}
+                    <button onclick="eliminarReporte('${r.ID}')" style="background: transparent; border: none; color: var(--alert-red); cursor: pointer; font-size: 1.1rem; font-family: var(--font-mono); transition: transform 0.2s;" title="Eliminar reporte de la base de datos" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">🗑️ [X]</button>
+                </div>
+                <div class="card-date">${vistaInicio} al ${vistaFin}</div>
+                <div class="card-score">${r.Score_Global ? parseFloat(r.Score_Global).toFixed(1) : '0'} <span style="font-size: 1rem; color: var(--text-muted);">/100</span></div>
+                <div class="card-badge">${r.Estado ? r.Estado.toUpperCase() : 'S/E'}</div>
+                <a href="Plantilla%20Reporte.html?id=${r.ID}" style="text-decoration: none;">
+                    <div class="view-btn">[ ACCEDER AL REPORTE ]</div>
+                </a>
+            `;
+            grid.appendChild(tarjeta);
+        });
+    }
+
+    const lineFilter = document.getElementById('lineFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    const clearBtn = document.getElementById('clearFilters');
+
+    function aplicarFiltros() {
+        const selectedLine = lineFilter.value;
+        const selectedDate = dateFilter.value;
+        let visibleCount = 0;
+        
+        const cards = document.querySelectorAll('.report-card');
+        const noResultsMsg = document.getElementById('noResultsMsg');
+
+        cards.forEach(card => {
+            const cardLine = card.getAttribute('data-line');
+            const cardStart = card.getAttribute('data-start');
+            const cardEnd = card.getAttribute('data-end');
+
+            const matchLine = (selectedLine === 'all' || selectedLine === cardLine);
+            
+            let matchDate = true;
+            if (selectedDate) {
+                matchDate = (selectedDate >= cardStart && selectedDate <= cardEnd);
+            }
+
+            if (matchLine && matchDate) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (noResultsMsg) {
+            noResultsMsg.style.display = (visibleCount === 0) ? 'block' : 'none';
+        }
+    }
+
+    lineFilter.addEventListener('change', aplicarFiltros);
+    dateFilter.addEventListener('change', aplicarFiltros);
+
+    clearBtn.addEventListener('click', () => {
+        lineFilter.value = 'all';
+        dateFilter.value = '';
+        aplicarFiltros();
+    });
+
+    window.addEventListener('DOMContentLoaded', cargarDatos);
+</script>
+
+</body>
+</html>
