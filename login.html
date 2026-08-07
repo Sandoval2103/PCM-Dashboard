@@ -101,8 +101,9 @@
             
             try {
                 const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: "login", usuario: u, password: p })
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // <-- EL PASAPORTE
+                body: JSON.stringify({ action: "login", usuario: u, password: p })
                 });
                 const data = await res.json();
                 
