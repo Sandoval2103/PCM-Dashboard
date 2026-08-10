@@ -82,8 +82,8 @@
 
     <div class="login-box">
         <h2>ACCESO</h2>
-        <input type="text" id="user" placeholder="Usuario" autocomplete="off">
-        <input type="password" id="pass" placeholder="Contraseña">
+        <input type="text" id="user" placeholder="Usuario" autocomplete="off" onkeypress="detectarEnter(event)">
+        <input type="password" id="pass" placeholder="Contraseña" onkeypress="detectarEnter(event)">
         <button onclick="iniciarSesion()" id="btn-login">INGRESAR</button>
         <div id="mensaje" class="msg"></div>
     </div>
@@ -91,6 +91,14 @@
     <script>
         // PEGA AQUÍ TU NUEVA URL DE APPS SCRIPT
         const API_URL = "https://script.google.com/macros/s/AKfycbyKeVzWjqYRNo58g2OHp8A8uuWDBuDQtT5t6Gp0eWypt2DAHw5g6FtnST3G_tb_Kjwx/exec"; 
+
+        function detectarEnter(event) {
+    // Si la tecla presionada es 'Enter' (código 13 o 'Enter')
+    if (event.key === "Enter" || event.keyCode === 13) {
+        event.preventDefault(); // Evita recargas raras de la página
+        iniciarSesion();        // Dispara el inicio de sesión
+    }
+}
         
         async function iniciarSesion() {
             const u = document.getElementById('user').value;
