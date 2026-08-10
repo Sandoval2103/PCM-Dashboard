@@ -19,7 +19,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-ui); line-height: 1.6; padding: 2rem; min-height: 100vh; background-image: linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px); background-size: 30px 30px; }
         .dashboard { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(min-content, max-content); gap: 1.5rem; }
-        .header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2rem; background: linear-gradient(90deg, var(--brand-navy), var(--bg-dark)); border-bottom: 2px solid var(--brand-gold); border-radius: 8px 8px 0 0; margin-bottom: 1rem; }
+        .header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 1.0rem 2rem; background: linear-gradient(90deg, var(--brand-navy), var(--bg-dark)); border-bottom: 2px solid var(--brand-gold); border-radius: 8px 8px 0 0; margin-bottom: 1rem; }
         .header-logo { height: 70px; width: auto; object-fit: contain; }
         .header-title { text-align: right; }
         .header-title h1 { font-family: var(--font-mono); color: var(--brand-gold); font-size: 1.8rem; letter-spacing: 1px; text-transform: uppercase; }
@@ -67,7 +67,7 @@
         .logo {
             width: 200px; /* <--- Cambia este número para ajustar el tamaño */
             height: auto;  /* Esto mantiene la proporción y no lo deforma */
-              margin-bottom: 50px; /* Dale un airecito abajo */
+              margin-bottom:0px; /* Dale un airecito abajo */
         }
     </style>
 </head>
@@ -76,7 +76,7 @@
         <header class="header">
             <div class="header-left">
                 <a href="index.html" class="btn-volver">[ &larr; VOLVER AL HUB ]</a>
-                <img src="logo-tactico2.png" class="logo">
+                <img src="logo-tactico1.png" class="logo">
             </div>
             <div class="header-title">
                 <h1 id="lbl-titulo">Reporte de Estado Táctico</h1>
