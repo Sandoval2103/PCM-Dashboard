@@ -11,6 +11,8 @@
     <!-- === ESTA ES LA LÍNEA NUEVA PARA EL FAVICON === -->
     <link rel="icon" type="image/png" href="favicon.png">
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -75,6 +77,9 @@
                <button onclick="cerrarSesion()" style="background: transparent; color: #ff4c4c; border: 1px solid #ff4c4c; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; margin-bottom: 20px;">
                     Cerrar Sesión
                 </button>
+                <button onclick="toggleDashboard()" style="background: var(--brand-gold); color: black; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; margin-bottom: 20px; margin-right: 10px;">
+                    📊 Ver Dashboard
+                </button>
                 <h1>Reporte Táctico PCM</h1>
                 <p>Directorio General de Efectividad</p>
             </div>
@@ -109,6 +114,22 @@
 
             <button id="clearFilters" class="btn-clear">[ X ] LIMPIAR</button>
         </div>
+
+        <!-- === PANEL DEL DASHBOARD (Oculto por defecto) === -->
+        <div id="dashboard-panel" style="display: none; background: #1e1e1e; border: 1px solid var(--brand-gold); border-radius: 8px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+            <h2 style="color: var(--brand-gold); margin-top: 0; text-align: center; letter-spacing: 2px;">MÉTRICAS GLOBALES</h2>
+    
+            <!-- Aquí acomodamos 2 gráficas lado a lado -->
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px;">
+                <div style="width: 100%; max-width: 400px;">
+                    <canvas id="graficaLineas"></canvas>
+                </div>
+                <div style="width: 100%; max-width: 400px;">
+                    <canvas id="graficaEstados"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- ============================================== -->
 
         <!-- CONTENEDOR DE TARJETAS -->
         <div class="grid-reports" id="reportGrid">
@@ -278,6 +299,79 @@
     });
 
     window.addEventListener('DOMContentLoaded', cargarDatos);
+
+    // Variables para guardar las gráficas y poder actualizarlas
+let chartLineas = null;
+let chartEstados = null;
+
+// Función para mostrar/ocultar el panel
+function toggleDashboard() {
+    const panel = document.getElementById("dashboard-panel");
+    if (panel.style.display === "none") {
+        panel.style.display = "block";
+        generarGraficas(); // Dibujar cuando se abre
+    } else {
+        panel.style.display = "none";
+    }
+}
+
+// Función principal que lee tus datos y pinta las gráficas
+function generarGraficas() {
+    // 1. Preparamos contadores vacíos
+    const conteoLineas = {};
+    let estadoVerde = 0, estadoAmarillo = 0, estadoRojo = 0;
+
+    // 2. Recorremos todos los reportes que ya bajaste de Google Sheets
+    // (Asumo que tu variable con los datos se llama 'reportesGlobales' o similar. 
+    // Si se llama distinto, cámbialo aquí)
+    reportesGlobales.forEach(reporte => {
+        // Contar por Línea
+        let linea = reporte.Linea || "Sin Línea";
+        conteoLineas[linea] = (conteoLineas[linea] || 0) + 1;
+
+        // Contar por Estado
+        let estado = (reporte.Estado || "").toUpperCase();
+        if (estado.includes("VERDE") || estado.includes("OK")) estadoVerde++;
+        else if (estado.includes("AMARILLO") || estado.includes("PRECAUCIÓN")) estadoAmarillo++;
+        else if (estado.includes("ROJO") || estado.includes("CRÍTICO")) estadoRojo++;
+    });
+
+    // 3. Configurar colores corporativos
+    Chart.defaults.color = '#ffffff'; // Letras blancas
+    
+    // --- GRÁFICA 1: Reportes por Línea (Barras) ---
+    const ctxLineas = document.getElementById('graficaLineas').getContext('2d');
+    if(chartLineas) chartLineas.destroy(); // Borrar la anterior si ya existía
+    
+    chartLineas = new Chart(ctxLineas, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(conteoLineas),
+            datasets: [{
+                label: 'Total de Reportes',
+                data: Object.values(conteoLineas),
+                backgroundColor: '#d4af37', // Dorado
+                borderRadius: 5
+            }]
+        }
+    });
+
+    // --- GRÁFICA 2: Estado Global (Dona) ---
+    const ctxEstados = document.getElementById('graficaEstados').getContext('2d');
+    if(chartEstados) chartEstados.destroy();
+    
+    chartEstados = new Chart(ctxEstados, {
+        type: 'doughnut',
+        data: {
+            labels: ['Óptimo (Verde)', 'Alerta (Amarillo)', 'Crítico (Rojo)'],
+            datasets: [{
+                data: [estadoVerde, estadoAmarillo, estadoRojo],
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                borderWidth: 0
+                    }]
+                }
+            });
+        }
 </script>
 
 </body>
