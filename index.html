@@ -372,6 +372,26 @@ function generarGraficas() {
                 }
             });
         }
+
+            // === VIGILANTE DE INACTIVIDAD ===
+            const TIEMPO_LIMITE = 5 * 60 * 1000; // 5 minutos (5 * 60 segundos * 1000 milisegundos)
+            let temporizador;
+            
+            function resetearVigilante() {
+                clearTimeout(temporizador);
+                temporizador = setTimeout(cerrarSesion, TIEMPO_LIMITE);
+            }
+            
+            // Eventos que "despiertan" al vigilante (detectan movimiento)
+            window.onload = resetearVigilante;
+            document.onmousemove = resetearVigilante;
+            document.onkeypress = resetearVigilante;
+            document.onclick = resetearVigilante;
+            document.onscroll = resetearVigilante;
+            
+            // Nota: Asegúrate de que tu función cerrarSesion() esté definida en este mismo archivo
+            // para que el temporizador pueda llamarla.
+            // =================================
 </script>
 
 </body>
