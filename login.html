@@ -76,6 +76,30 @@
             font-size: 0.9em;
             height: 20px;
         }
+
+                /* === ANIMACIÓN DE CARGA === */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(0,0,0,0.3);
+            border-radius: 50%;
+            border-top-color: black; /* Color del borde que gira */
+            animation: girar 1s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        @keyframes girar {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Efecto para cuando el botón está bloqueado */
+        button:disabled {
+            background: #a38629;
+            cursor: not-allowed;
+            transform: none;
+        }
     </style>
 </head>
 <body>
@@ -111,7 +135,9 @@
                 return; 
             }
             
-            btn.textContent = "VERIFICANDO...";
+          // Agregamos el circulito y bloqueamos el botón
+            btn.innerHTML = '<span class="spinner"></span> VERIFICANDO...';
+            btn.disabled = true;
             msg.textContent = "";
             
             try {
@@ -123,16 +149,19 @@
                 const data = await res.json();
                 
                 if(data.status === "success") {
-                    // Magia: Guardamos una "llave" temporal en el navegador
                     sessionStorage.setItem("acceso_concedido", "true");
-                    window.location.href = "index.html"; // Redirigimos al menú
+                    window.location.href = "index.html"; 
                 } else {
                     msg.textContent = "[!] Usuario o contraseña incorrectos";
-                    btn.textContent = "INGRESAR";
+                    // Regresamos el botón a la normalidad
+                    btn.innerHTML = "INGRESAR";
+                    btn.disabled = false;
                 }
             } catch(e) {
                 msg.textContent = "[!] Error de conexión";
-                btn.textContent = "INGRESAR";
+                // Regresamos el botón a la normalidad
+                btn.innerHTML = "INGRESAR";
+                btn.disabled = false;
             }
         }
     </script>
