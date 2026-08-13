@@ -332,7 +332,7 @@ function generarGraficas() {
         // Contar por Estado
         let estado = (reporte.Estado || "").toUpperCase();
         if (estado.includes("VERDE") || estado.includes("OK")) estadoVerde++;
-        else if (estado.includes("AMARILLO") || estado.includes("PRECAUCIÓN")) estadoAmarillo++;
+        else if (estado.includes("AMARILLO") || estado.includes("ESTABLE")) estadoAmarillo++;
         else if (estado.includes("ROJO") || estado.includes("CRÍTICO")) estadoRojo++;
     });
 
@@ -363,7 +363,7 @@ function generarGraficas() {
     chartEstados = new Chart(ctxEstados, {
         type: 'doughnut',
         data: {
-            labels: ['Óptimo (Verde)', 'Alerta (Amarillo)', 'Crítico (Rojo)'],
+            labels: ['Óptimo (Verde)', 'Estable (Amarillo)', 'Crítico (Rojo)'],
             datasets: [{
                 data: [estadoVerde, estadoAmarillo, estadoRojo],
                 backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
